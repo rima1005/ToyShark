@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
+import com.lipisoft.toyshark.DatabaseHelper;
 import com.lipisoft.toyshark.Packet;
 import com.lipisoft.toyshark.PacketManager;
 import com.lipisoft.toyshark.network.ip.IPPacketFactory;
@@ -485,6 +486,7 @@ public class TCPPacketFactory {
 
 		final int sourcePort = stream.getShort() & 0xFFFF;
 		final int destPort = stream.getShort() & 0xFFFF;
+
 		if (destPort == 80)
 		{
 			System.out.println("Starting now!!! ______________________________________");
@@ -554,9 +556,15 @@ public class TCPPacketFactory {
 			System.out.println("Those are the found http datasets");
 			for (String item:all_strings)
 			{
-				if (item != null)
+				if (item != null) {
 					System.out.println(item);
+				}
 			}
+			/* TODO change */
+			DatabaseHelper dh = DatabaseHelper.getInstance();
+
+			if(!DatabaseHelper.getInstance(getApplicationContext()).hostexists(packet.daddr, packet.dport))
+				DatabaseHelper.getInstance(getApplicationContext()).insertHost(copied_data.daddr, packet.dport, host_, ciphersuite, protocol);
 		}
 		copied_data.clear();
 		final long sequenceNumber = stream.getInt();
