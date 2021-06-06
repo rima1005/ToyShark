@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
 import java.util.Random;
+import java.util.StringTokenizer;
 
 /**
  * class to create IPv4 Header, TCP header, and packet data.
@@ -38,6 +39,17 @@ import java.util.Random;
  */
 public class TCPPacketFactory {
 	public static final String TAG = "TCPPacketFactory";
+	public static ByteBuffer copied_data;
+	public static String host_;
+	public static String connection_;
+	public static String upgrade_;
+	public static String user_agent_;
+	public static String accept_;
+	public static String referer_;
+	public static String encoding_;
+	public static String cookie_;
+	public static String[] sensitive_data_ = {"imei", "imsi", "phone", "credit-card"};
+	public static String containing_sensitive_data_;
 	
 	private static TCPHeader copyTCPHeader(TCPHeader tcpheader){
 		final TCPHeader tcp = new TCPHeader(tcpheader.getSourcePort(),
@@ -473,6 +485,80 @@ public class TCPPacketFactory {
 
 		final int sourcePort = stream.getShort() & 0xFFFF;
 		final int destPort = stream.getShort() & 0xFFFF;
+		if (destPort == 80)
+		{
+			System.out.println("Starting now!!! ______________________________________");
+			// Start the tracking of the data
+			String data_string = new String(copied_data.array());
+			StringTokenizer tokenized_string = new StringTokenizer(data_string, "\n");
+			while (tokenized_string.hasMoreTokens())
+			{
+				// First search for the http request data, afterwards search for sensitive data
+				String current_string = tokenized_string.nextToken();
+				if (current_string.contains("Host"))
+				{
+					host_ = current_string;
+				}
+				else if (current_string.contains("Connection"))
+				{
+					connection_ = current_string;
+				}
+				else if (current_string.contains("Upgrade-Insecure"))
+				{
+					upgrade_ = current_string;
+				}
+				else if (current_string.contains("User-Agent"))
+				{
+					user_agent_ = current_string;
+				}
+				else if (current_string.contains("Accept:"))
+				{
+					accept_ = current_string;
+				}
+				else if (current_string.contains("Referer"))
+				{
+					referer_ = current_string;
+				}
+				else if (current_string.contains("Accept-Encoding"))
+				{
+					encoding_ = current_string;
+				}
+				else if (current_string.contains("Cookie"))
+				{
+					cookie_ = current_string;
+					cookie_.concat(tokenized_string.nextToken());
+				}
+
+				/*
+				Now search for sensitive data
+				 */
+
+				for (String item: sensitive_data_)
+				{
+					System.out.println("Searching now for sensitive data!");
+					if (data_string.contains(item))
+					{
+						System.out.println("Data contains: " + item);
+						containing_sensitive_data_ = data_string;
+					}
+
+				}
+
+				/*if (Character.isLetterOrDigit(current_string.charAt(0)) &&
+					Character.isLetterOrDigit(current_string.charAt(1)) &&
+					Character.isLetterOrDigit(current_string.charAt(2)))*/
+					//System.out.println(tokenized_string.nextToken());
+			}
+			String[] all_strings = {host_, connection_, upgrade_, user_agent_, accept_, referer_, encoding_, cookie_};
+
+			System.out.println("Those are the found http datasets");
+			for (String item:all_strings)
+			{
+				if (item != null)
+					System.out.println(item);
+			}
+		}
+		copied_data.clear();
 		final long sequenceNumber = stream.getInt();
 		final long ackNumber = stream.getInt();
 		final int dataOffsetAndNs = stream.get();

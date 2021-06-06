@@ -34,6 +34,7 @@ import com.lipisoft.toyshark.socket.SocketDataPublisher;
 import com.lipisoft.toyshark.socket.SocketNIODataService;
 import com.lipisoft.toyshark.socket.SocketProtector;
 import com.lipisoft.toyshark.transport.tcp.PacketHeaderException;
+import com.lipisoft.toyshark.transport.tcp.TCPPacketFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +44,7 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 public class ToySharkVPNService extends VpnService implements Handler.Callback,
 		Runnable, IProtectSocket, IReceivePacket{
@@ -425,12 +427,15 @@ public class ToySharkVPNService extends VpnService implements Handler.Callback,
 		serviceValid = true;
 		while (serviceValid) {
 			//read packet from vpn client
+			//Log.d(TAG, "Hi");
 			data = packet.array();
 			length = clientReader.read(data);
 			if (length > 0) {
 				//Log.d(TAG, "received packet from vpn client: "+length);
 				try {
 					packet.limit(length);
+
+					TCPPacketFactory.copied_data = packet.duplicate();
 
 					handler.handlePacket(packet);
 				} catch (PacketHeaderException e) {
