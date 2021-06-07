@@ -16,11 +16,14 @@
 
 package com.lipisoft.toyshark;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 
+import com.lipisoft.toyshark.application.MyApplication;
 import com.lipisoft.toyshark.network.ip.IPv4Header;
 import com.lipisoft.toyshark.transport.tcp.TCPHeader;
 import com.lipisoft.toyshark.transport.udp.UDPHeader;
+import com.lipisoft.toyshark.util.DatabaseHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -121,6 +124,9 @@ public class Session {
 		this.sourcePort = sourcePort;
 		this.destIp = destinationIp;
 		this.destPort = destinationPort;
+		if(ToySharkVPNService.getDbHandler() != null)
+			ToySharkVPNService.getDbHandler().queueHost(destIp, destPort);
+
 	}
 
 	/*

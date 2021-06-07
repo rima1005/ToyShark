@@ -39,7 +39,7 @@ import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements HostListAdapter.OnHostListener {
 	private static String TAG = "MainActivity";
 	private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 0;
 
@@ -52,8 +52,11 @@ public class MainActivity extends AppCompatActivity {
 		recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-		final PacketListAdapter adapter = new PacketListAdapter(PacketManager.INSTANCE.getList());
-		PacketManager.INSTANCE.setAdapter(adapter);
+
+		final HostListAdapter adapter = new HostListAdapter(HostManager.INSTANCE.getList(), this);
+		HostManager.INSTANCE.setAdapter(adapter);
+		//final PacketListAdapter adapter = new PacketListAdapter(PacketManager.INSTANCE.getList());
+		//PacketManager.INSTANCE.setAdapter(adapter);
 		recyclerView.setAdapter(adapter);
 
 		checkRuntimePermission();
@@ -243,5 +246,16 @@ public class MainActivity extends AppCompatActivity {
 //		}
 //		return true;
 		return isConnectedToInternet();
+	}
+
+	@Override
+	public void onHostClick(int position) {
+		Intent intent = new Intent(this, HostDetails.class);
+		Host host = HostManager.INSTANCE.getList().get(position);
+		intent.putExtra("ip", host.ip);
+		intent.putExtra("port", host.port);
+		startActivity(intent);
+
+
 	}
 }

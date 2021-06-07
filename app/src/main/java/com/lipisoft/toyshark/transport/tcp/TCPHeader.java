@@ -268,5 +268,9 @@ public class TCPHeader implements ITransportHeader{
 	void setTimeStampReplyTo(int timeStampReplyTo) {
 		this.timeStampReplyTo = timeStampReplyTo;
 	}
+
+	public int getHeaderLength() {
+		return getTCPHeaderLength();
+	};
 	
 }

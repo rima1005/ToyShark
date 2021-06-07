@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".TlsActivity"
+    android:fillViewport="true">
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dip">
+
+        <TextView
+            android:id="@+id/tvHandshakeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Handshake done with"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+
+        <TextView
+            android:id="@+id/tvHandshakeDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:padding="10dp"
+            android:textSize="15sp"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="TLS 1.2 - TLS_ECDHS" />
+
+
+        <TextView
+            android:id="@+id/tvTitleProtocols"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Supported Protocols"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <ListView
+            android:id="@+id/lvDetailsProtocols"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:padding="10dp"
+            android:text="TextView"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitleProtocols" />
+
+        <TextView
+            android:id="@+id/tvTitleCipherSuits"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="Supported Cipher Suits"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/lvDetailsProtocols"/>
+
+        <ListView
+            android:id="@+id/lvDetailsCipherSuits"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:padding="10dp"
+            android:text="TextView"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitleCipherSuits"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</ScrollView>

@@ -59,5 +59,9 @@ public class UDPHeader implements ITransportHeader{
 	public void setChecksum(int checksum) {
 		this.checksum = checksum;
 	}
-	
+
+	@Override
+	public int getHeaderLength() {
+		return 8;
+	}
 }

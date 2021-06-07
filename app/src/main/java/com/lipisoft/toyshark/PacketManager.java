@@ -19,7 +19,7 @@ public enum PacketManager {
         public void handleMessage(Message msg) {
             if (msg != null) {
                 if (msg.what == PacketManager.PACKET) {
-                    adapter.notifyDataSetChanged();
+                    //adapter.notifyDataSetChanged();
                 }
             }
             super.handleMessage(msg);

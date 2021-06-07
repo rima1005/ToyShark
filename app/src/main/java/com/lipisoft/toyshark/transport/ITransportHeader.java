@@ -7,4 +7,5 @@ package com.lipisoft.toyshark.transport;
 public interface ITransportHeader {
     int getSourcePort();
     int getDestinationPort();
+    int getHeaderLength();
 }

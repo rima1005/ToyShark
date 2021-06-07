@@ -21,8 +21,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
+import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
@@ -34,6 +37,8 @@ import com.lipisoft.toyshark.socket.SocketDataPublisher;
 import com.lipisoft.toyshark.socket.SocketNIODataService;
 import com.lipisoft.toyshark.socket.SocketProtector;
 import com.lipisoft.toyshark.transport.tcp.PacketHeaderException;
+import com.lipisoft.toyshark.util.DatabaseHelper;
+import com.lipisoft.toyshark.util.DbHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,10 +49,14 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 
+import javax.net.ssl.HandshakeCompletedListener;
+
 public class ToySharkVPNService extends VpnService implements Handler.Callback,
 		Runnable, IProtectSocket, IReceivePacket{
 	private static final String TAG = "ToySharkVPNService";
 	private static final int MAX_PACKET_LEN = 1500;
+
+	public static final int MSG_HOST = 1;
 
 	private Handler mHandler;
 	private Thread mThread;
@@ -60,6 +69,16 @@ public class ToySharkVPNService extends VpnService implements Handler.Callback,
 	private File traceDir;
 	private PCapFileWriter pcapOutput;
 	private FileOutputStream timeStream;
+
+	private static DbHandler dbHandler = null;
+	private Looper dbLooper;
+
+
+	public static DbHandler getDbHandler()
+	{
+		return dbHandler;
+	}
+
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -82,6 +101,16 @@ public class ToySharkVPNService extends VpnService implements Handler.Callback,
 		// The handler is only used to show messages.
 		if (mHandler == null) {
 			mHandler = new Handler(this);
+		}
+
+		HandlerThread dbHandlerThread = new HandlerThread(getString(R.string.app_name) + " db inspection", Process.THREAD_PRIORITY_DEFAULT);
+
+		dbHandlerThread.start();
+		dbLooper = dbHandlerThread.getLooper();
+
+		if (dbHandler == null)
+		{
+			dbHandler = new DbHandler(dbLooper);
 		}
 
 		// Stop the previous session by interrupting the thread.

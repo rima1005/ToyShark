@@ -17,8 +17,10 @@
 package com.lipisoft.toyshark;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
+import com.lipisoft.toyshark.application.MyApplication;
 import com.lipisoft.toyshark.network.ip.IPPacketFactory;
 import com.lipisoft.toyshark.network.ip.IPv4Header;
 import com.lipisoft.toyshark.socket.SocketData;
@@ -28,6 +30,7 @@ import com.lipisoft.toyshark.transport.tcp.TCPPacketFactory;
 import com.lipisoft.toyshark.transport.ITransportHeader;
 import com.lipisoft.toyshark.transport.udp.UDPHeader;
 import com.lipisoft.toyshark.transport.udp.UDPPacketFactory;
+import com.lipisoft.toyshark.util.DatabaseHelper;
 import com.lipisoft.toyshark.util.PacketUtil;
 
 import androidx.annotation.NonNull;
@@ -190,6 +193,24 @@ class SessionHandler {
 		}
 
 		final Packet packet = new Packet(ipHeader, transportHeader, stream.array());
+
+		if(packet.getDestinationPort() == 80)
+		{
+			String data = new String(packet.getBuffer());
+
+			if(data.contains("HTTP"))
+			{
+				int ipHeaderLength = packet.getIpHeader().getIPHeaderLength();
+				int transportHeaderLength = packet.getTransportHeader().getHeaderLength();
+				if(ipHeaderLength + transportHeaderLength <= data.length()-1)
+					data = data.substring(ipHeaderLength + transportHeaderLength);
+				DatabaseHelper.getInstance(MyApplication.instance.getApplicationContext()).insertPacket(packet.getIpHeader().getDestinationIP(),packet.getDestinationPort(), Byte.toUnsignedInt(packet.getProtocol()) ,packet.getBuffer().length, data);
+
+			}
+		}
+
+
+
 		PacketManager.INSTANCE.add(packet);
 		PacketManager.INSTANCE.getHandler().obtainMessage(PacketManager.PACKET).sendToTarget();
 
